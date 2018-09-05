@@ -1,0 +1,13 @@
+ffmpeg:
+  privileged: true
+  build: .
+  devices:
+    - /dev/nvidiactl:/dev/nvidiactl
+    - /dev/nvidia3:/dev/nvidia3
+    - /dev/nvidia2:/dev/nvidia2
+    - /dev/nvidia1:/dev/nvidia1
+    - /dev/nvidia0:/dev/nvidia0
+  container_name: ffmpeg
+  volumes:
+    - /usr/lib64/nvidia:/usr/local/nvidia/lib64
+    - /var/lib/chinachu/recorded:/var/lib/videos
