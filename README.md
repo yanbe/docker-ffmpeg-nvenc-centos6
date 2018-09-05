@@ -5,8 +5,8 @@ It builds ffmpeg with NVEnc (hardware acceraration for video encoding using NVID
 
 ## History
 
-Since [nvidia-docker2](https://github.com/NVIDIA/nvidia-docker) (even nvidia-docker) 
-does not support Docker 1.7 runs under CentOS 6, I wrote nealiy equivalent 
+Since [nvidia-docker2](https://github.com/NVIDIA/nvidia-docker) (even nvidia-docker)
+does not support Docker 1.7 runs under CentOS 6, I wrote nealiy equivalent
 Dockerfile and compose file by myself.
 
 ## Tested enviionment
@@ -19,7 +19,7 @@ Dockerfile and compose file by myself.
 >> Linux 2.6.32-754.3.5.el6.x86_64
 > Docker
 >> version 1.7.1, build 786b29d
- 
+
 ## Prerequisites
 
 - NVIDIA video card since Kepler family (at least GeForce GT 710/630) on your linux box
@@ -29,13 +29,13 @@ Dockerfile and compose file by myself.
 ```
 # You have to below only if you have never used EPEL repository
 rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-rpm -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm 
+rpm -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
 yum update
 
 # install NVIDIA video driver
 yum install kmod-nvidia
 
-# uncomment 2 lines in `/etc/modprobe.d/nvidia.conf` 
+# uncomment 2 lines in `/etc/modprobe.d/nvidia.conf`
 # so `/dev/nvidia-uvm` is created on every boot
 vi /etc/modprobe.d/nvidia.conf
 
@@ -55,7 +55,7 @@ nvidia_drm              1150  0
 
 ```
 
-## Lisense agreement 
+## Lisense agreement
 
 This Dockerfile build on the top of `nvidia/cuda` Docker image publicly avilable on Docker Hub.
 
@@ -66,7 +66,7 @@ if you use this image in this repository.
 
 ## Install ans Usage
 
-```sh
+```
 git clone https://github.com/yanbe/docker-ffmpeg-nvenc-centos6 venc
 cd venc
 # edit docker-compose.yml so configure your video storage directory
@@ -77,8 +77,8 @@ vi docker-compose.yml
 ```
   volumes:
     - /usr/lib64/nvidia:/usr/local/nvidia/lib64
-    - /path/to/your/videos:/var/lib/videos # edit here
-```                                                    
+    - /path/to/your/videos:/var/lib/videos  # edit here
+```
 
 ```
 # build (it takes about 30 min)
@@ -119,7 +119,11 @@ frame= 5418 fps=101 q=33.0 Lsize=   45622kB time=00:03:00.74 bitrate=2067.7kbits
 
 ```
 
-## References 
+Since HP Proliant MicroServer's CPU is not powerful (AMD Turion II Neo N54L 1.7Ghz dual-core),
+Transcoding video from mpeg2 to H264 over 100 fps cannot be achieved without hardware acceralation.
+Cheers!
+
+## References
 
 This work is based on the article below. Very thanks!
 
