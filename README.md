@@ -44,7 +44,7 @@ vi /etc/modprobe.d/nvidia.conf
 reboot
 ```
 
-After reboot, ensure all drivers are loaded correctly.
+After reboot, ensure all drivers are loaded correctly and device files are created.
 
 
 ```
@@ -54,6 +54,10 @@ nvidia              14360916  1 nvidia_uvm
 ipmi_msghandler        40332  1 nvidia
 i2c_core               29164  2 i2c_piix4,nvidia
 nvidia_drm              1150  0
+
+$ ls /dev/nvidia*
+/dev/nvidia-uvm  /dev/nvidia1  /dev/nvidia3  /dev/nvidia5  /dev/nvidia7  /dev/nvidia9
+/dev/nvidia0     /dev/nvidia2  /dev/nvidia4  /dev/nvidia6  /dev/nvidia8  /dev/nvidiactl
 
 ```
 
