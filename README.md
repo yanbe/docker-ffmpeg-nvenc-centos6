@@ -14,9 +14,11 @@ Dockerfile and compose file by myself.
 > Hardware
 >> HP Proliant MicroServer N54L
 >> NVIDIA Geforce GT 730
+
 > OS
 >> CentOS Linux release 6.10 (Core)
 >> Linux 2.6.32-754.3.5.el6.x86_64
+
 > Docker
 >> version 1.7.1, build 786b29d
 
@@ -35,9 +37,9 @@ yum update
 # install NVIDIA video driver
 yum install kmod-nvidia
 
+vi /etc/modprobe.d/nvidia.conf
 # uncomment 2 lines in `/etc/modprobe.d/nvidia.conf`
 # so `/dev/nvidia-uvm` is created on every boot
-vi /etc/modprobe.d/nvidia.conf
 
 reboot
 ```
@@ -69,9 +71,9 @@ if you use this image in this repository.
 ```
 git clone https://github.com/yanbe/docker-ffmpeg-nvenc-centos6 venc
 cd venc
-# edit docker-compose.yml so configure your video storage directory
 vi docker-compose.yml
 ```
+Edit docker-compose.yml to configure mount your video storage directory on docker container.
 
 ### in docker-compose.yml
 ```
@@ -79,13 +81,18 @@ vi docker-compose.yml
     - /usr/lib64/nvidia:/usr/local/nvidia/lib64
     - /path/to/your/videos:/var/lib/videos  # edit here
 ```
+### Build docker iamge
 
 ```
-# build (it takes about 30 min)
 docker-compose build
+```
 
-# run
-# working directory is docker-compose.yml so you don't need to write full path
+# Run NVEnc-enabled ffmpeg in Docker
+
+Working directory is /var/lib/videos equal to your video storage directory
+so you don't need to write full path.
+
+```
 docker-compose run --rm ffmpeg ffmpeg -i input.m2ts -c:v h264_nvenc output.mp4
 
 ```
