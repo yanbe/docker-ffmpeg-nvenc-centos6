@@ -1,7 +1,7 @@
 # docker-ffmpeg-nvenc-centos6
-It builds ffmpeg with NVEnc (hardware acceraration for video encoding using NVIDIA video cards),
- so you can easily build video encoding environment.
 
+It builds ffmpeg with NVIDIA's NVEnc (hadware acceraration for video encoding on NVIDIA GPUs),
+so you can easily get fast and efficient video encoding environment.
 
 ## History
 
