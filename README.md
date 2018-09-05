@@ -136,6 +136,6 @@ Cheers!
 
 ## References
 
-This work is based on the article below. Very thanks!
+This work is based on the article below. Thanks you very much!
 
 https://qiita.com/toshitanian/items/8aaca6b867099ebd442d
