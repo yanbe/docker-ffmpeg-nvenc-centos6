@@ -106,7 +106,7 @@ docker-compose build
 ### Transcode video with NVEnc and NVCUVID enabled ffmpeg in Docker
 
 ```
-docker-compose run --rm ffmpeg ffmpeg -hwaccel_device 0 -hwaccel cuvid -c:v mpeg2_cuvid -i input.m2ts -vf scale_npp=-1:720 -c:v h264_nvenc -preset slow output.mp4
+docker-compose run --rm ffmpeg ffmpeg -hwaccel cuvid -c:v mpeg2_cuvid -deint 1 -drop_second_field true -i input.m2ts -c:v h264_nvenc output.mp4
 ```
 Note that working directory is /var/lib/videos equal to your video storage directory
 so you don't need to write full path.
