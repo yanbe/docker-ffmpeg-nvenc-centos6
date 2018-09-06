@@ -2,18 +2,9 @@ ffmpeg:
   build: .
   devices:
     - /dev/nvidia-uvm:/dev/nvidia-uvm
-    - /dev/nvidiactl:/dev/nvidiactl
     - /dev/nvidia0:/dev/nvidia0
-    - /dev/nvidia1:/dev/nvidia1
-    - /dev/nvidia2:/dev/nvidia2
-    - /dev/nvidia3:/dev/nvidia3
-    - /dev/nvidia4:/dev/nvidia4
-    - /dev/nvidia5:/dev/nvidia5
-    - /dev/nvidia6:/dev/nvidia6
-    - /dev/nvidia7:/dev/nvidia7
-    - /dev/nvidia8:/dev/nvidia8
-    - /dev/nvidia9:/dev/nvidia9
+    - /dev/nvidiactl:/dev/nvidiactl
   container_name: ffmpeg
   volumes:
     - /usr/lib64/nvidia:/usr/local/nvidia/lib64
-    - /path/to/your/videos:/var/lib/videos
+    - /var/lib/chinachu/recorded:/var/lib/videos

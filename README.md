@@ -26,40 +26,8 @@ Dockerfile and compose file by myself.
 
 - NVIDIA video card since Kepler family (at least GeForce GT 710/630) on your linux box
 -- see https://developer.nvidia.com/video-encode-decode-gpu-support-matrix
-- `kmod-nvidia` NVIDIA video card driver is installed from EPEL repository
-
-```
-# You have to below only if you have never used EPEL repository
-rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-rpm -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
-yum update
-
-# install NVIDIA video driver
-yum install kmod-nvidia
-
-vi /etc/modprobe.d/nvidia.conf
-# uncomment 2 lines in `/etc/modprobe.d/nvidia.conf`
-# so `/dev/nvidia-uvm` is created on every boot
-
-reboot
-```
-
-After reboot, ensure all drivers are loaded correctly and device files are created.
-
-
-```
-$ lsmod | grep nvidia
-nvidia_uvm            727407  0
-nvidia              14360916  1 nvidia_uvm
-ipmi_msghandler        40332  1 nvidia
-i2c_core               29164  2 i2c_piix4,nvidia
-nvidia_drm              1150  0
-
-$ ls /dev/nvidia*
-/dev/nvidia-uvm  /dev/nvidia1  /dev/nvidia3  /dev/nvidia5  /dev/nvidia7  /dev/nvidia9
-/dev/nvidia0     /dev/nvidia2  /dev/nvidia4  /dev/nvidia6  /dev/nvidia8  /dev/nvidiactl
-
-```
+- `nvidia-kmod` NVIDIA video card driver and `nvidia-modprobe` command is installed from cuda repository
+-- If you already installed `kmod-nvidia`,  `yum remove` it first 
 
 ## Lisense agreement
 
@@ -70,55 +38,92 @@ https://hub.docker.com/r/nvidia/cuda/
 `nvidia/cuda` Docker image includes `CUDA Toolkit` that requires lisense agreement
 if you use this image in this repository.
 
-## Install ans Usage
+## Install and Usage
 
+### `nvidia-kmod` driver installation
+
+```
+curl -O http://developer.download.nvidia.com/compute/cuda/repos/rhel6/x86_64/cuda-repo-rhel6-9.2.148-1.x86_64.rpm
+rpm -i cuda-repo-rhel6-9.2.148-1.x86_64.rpm
+yum install perl dkms  # nvidia-kmod dependency package
+yum install nvidia-kmod xorg-x11-drv-nvidia xorg-x11-drv-nvidia-libs
+```
+
+### Setup scripts, build docker image and run
 ```
 git clone https://github.com/yanbe/docker-ffmpeg-nvenc-centos6 venc
 cd venc
-vi docker-compose.yml
 ```
-Edit docker-compose.yml to configure mount your video storage directory on docker container.
 
-### in docker-compose.yml
+On CentOS 6, nvidia-kmod package does not create /dev/nvidia* device files 
+automatically. So we have to setup script manually.
+
+ref: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-verifications
+
+cp nvidia-device-files.sh /usr/local/bin
+
+vi /etc/init.d/rc.local
+
+# add following line in /etc/init.d/rc.local:
+# 
+# /usr/local/bin/nvidia-device-files.sh
+
+reboot
 ```
+
+After reboot, ensure all drivers are loaded correctly and device files are created.
+
+```
+$ lsmod | grep nvidia
+nvidia_uvm            727407  0
+nvidia              14360916  1 nvidia_uvm
+ipmi_msghandler        40332  1 nvidia
+i2c_core               29164  2 i2c_piix4,nvidia
+nvidia_drm              1150  0
+
+$ ls /dev/nvidia*
+/dev/nvidia-uvm /dev/nvidia0 /dev/nvidiactl
+```
+
+Edit docker-compose.yml in the `venc` directory to configure your video storage 
+directory mounted on docker container.
+
+```
+vi docker-compose.yml
+
+# in docker-compose.yml
   volumes:
     - /usr/lib64/nvidia:/usr/local/nvidia/lib64
-    - /path/to/your/videos:/var/lib/videos  # edit here
+    - /path/to/your/videos:/var/lib/videos  # edit '/path/to/your/videos'
 ```
-### Build docker iamge
+
+Then build docker image by following command. (it takes about 30 minites)
 
 ```
 docker-compose build
 ```
 
-# Run NVEnc-enabled ffmpeg in Docker
+### Transcode video with NVEnc and NVCUVID enabled ffmpeg in Docker
 
-Working directory is /var/lib/videos equal to your video storage directory
+```
+docker-compose run --rm ffmpeg ffmpeg -hwaccel_device 0 -hwaccel cuvid -c:v mpeg2_cuvid -i input.m2ts -vf scale_npp=-1:720 -c:v h264_nvenc -preset slow output.mp4
+```
+Note that working directory is /var/lib/videos equal to your video storage directory
 so you don't need to write full path.
-
-```
-docker-compose run --rm ffmpeg ffmpeg -i input.m2ts -c:v h264_nvenc output.mp4
-
-```
+(command line options are based on https://trac.ffmpeg.org/wiki/HWAccelIntro )
 
 And you will see hardware accelarated video encoding in the docker!
 
 ```
-ffmpeg version N-91790-g23fe072 Copyright (c) 2000-2018 the FFmpeg developers
-  built with gcc 5.4.0 (Ubuntu 5.4.0-6ubuntu1~16.04.10) 20160609
-  configuration: --enable-cuda --enable-cuvid --enable-nvenc --enable-nonfree --enable-libnpp --extra-cflags=-I/usr/local/cuda/include
-  libavutil      56. 19.100 / 56. 19.100
-  libavcodec     58. 27.101 / 58. 27.101
-  libavformat    58. 17.106 / 58. 17.106
-  libavdevice    58.  4.101 / 58.  4.101
-  libavfilter     7. 26.100 /  7. 26.100
-  libswscale      5.  2.100 /  5.  2.100
-  libswresample   3.  2.100 /  3.  2.100
 (snip)
-Output #0, mp4, to 'output.mp4':
+Stream mapping:
+  Stream #0:0 -> #0:0 (mpeg2video (mpeg2_cuvid) -> h264 (h264_nvenc))
+  Stream #0:1 -> #0:1 (aac (native) -> aac (native))
+Press [q] to stop, [?] for help
+Output #0, mp4, to 'output.mp4':      0kB time=-577014:32:22.77 bitrate=  -0.0kbits/s speed=N/A
   Metadata:
-    encoder         : Lavf58.17.106
-    Stream #0:0: Video: h264 (h264_nvenc) (Main) (avc1 / 0x31637661), yuv420p, 1440x1080 [SAR 4:3 DAR 16:9], q=-1--1, 2000 kb/s, 29.97 fps, 30k tbn, 29.97 tbc
+    encoder         : Lavf58.18.100
+    Stream #0:0: Video: h264 (h264_nvenc) (Main) (avc1 / 0x31637661), cuda, 960x720 [SAR 4:3 DAR 16:9], q=-1--1, 2000 kb/s, 29.97 fps, 30k tbn, 29.97 tbc
     Metadata:
       encoder         : Lavc58.27.101 h264_nvenc
     Side data:
@@ -126,12 +131,12 @@ Output #0, mp4, to 'output.mp4':
     Stream #0:1: Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 128 kb/s
     Metadata:
       encoder         : Lavc58.27.101 aac
-frame= 5418 fps=101 q=33.0 Lsize=   45622kB time=00:03:00.74 bitrate=2067.7kbits/s dup=27 drop=0 speed=3.37x
-
+frame=10668 fps=173 q=26.0 size=   93184kB time=00:05:55.85 bitrate=2145.2kbits/s dup=27 drop=0 speed=5.77x
 ```
 
-Since HP Proliant MicroServer's CPU is not powerful (AMD Turion II Neo N54L 1.7Ghz dual-core),
-Transcoding video from mpeg2 to H264 over 100 fps cannot be achieved without hardware acceralation.
+Since HP Proliant MicroServer N54L 's CPU is not powerful (AMD Turion II Neo N54L 2.2Ghz dual-core),
+Transcoding video from mpeg2 to H264 over 170 fps cannot be achieved without hardware acceralation.
+
 Cheers!
 
 ## References
