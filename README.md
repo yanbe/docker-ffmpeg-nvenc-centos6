@@ -101,7 +101,6 @@ Then build docker image by following command. (it takes about 30 minites)
 
 ```
 docker-compose build
-```
 
 ### Transcode video with NVEnc and NVCUVID enabled ffmpeg in Docker
 
