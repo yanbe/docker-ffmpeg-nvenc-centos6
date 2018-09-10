@@ -100,12 +100,14 @@ Then build docker image by following command. (it takes about 30 minites)
 
 ```
 docker-compose build
+```
 
 ### Transcode video with NVEnc and NVCUVID enabled ffmpeg in Docker
 
 ```
 docker-compose run --rm ffmpeg ffmpeg -hwaccel cuvid -c:v mpeg2_cuvid -deint 1 -drop_second_field true -i input.m2ts -c:v h264_nvenc output.mp4
 ```
+
 Note that working directory is /var/lib/videos equal to your video storage directory
 so you don't need to write full path.
 (command line options are based on https://trac.ffmpeg.org/wiki/HWAccelIntro )
