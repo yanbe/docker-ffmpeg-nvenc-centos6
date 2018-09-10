@@ -60,13 +60,14 @@ automatically. So we have to setup script manually.
 
 ref: https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#runfile-verifications
 
+```
 cp nvidia-device-files.sh /usr/local/bin
 
 vi /etc/init.d/rc.local
-
 # add following line in /etc/init.d/rc.local:
 # 
 # /usr/local/bin/nvidia-device-files.sh
+```
 
 reboot
 ```
