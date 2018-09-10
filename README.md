@@ -45,7 +45,6 @@ if you use this image in this repository.
 ```
 curl -O http://developer.download.nvidia.com/compute/cuda/repos/rhel6/x86_64/cuda-repo-rhel6-9.2.148-1.x86_64.rpm
 rpm -i cuda-repo-rhel6-9.2.148-1.x86_64.rpm
-yum install perl dkms  # nvidia-kmod dependency package
 yum install nvidia-kmod xorg-x11-drv-nvidia xorg-x11-drv-nvidia-libs
 ```
 
