@@ -67,8 +67,6 @@ vi /etc/init.d/rc.local
 # add following line in /etc/init.d/rc.local:
 # 
 # /usr/local/bin/nvidia-device-files.sh
-```
-
 reboot
 ```
 
